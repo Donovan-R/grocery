@@ -8,6 +8,7 @@ const articleToAdd = document.getElementById("basket");
 const placeHolder = articleToAdd.getAttribute("placeholder");
 const list = document.querySelector(".listDetails");
 const clearBtn = document.querySelector(".listClear");
+
 let editFlag = false;
 let editId = "";
 let editElement = "article";
@@ -49,9 +50,9 @@ function createListItem(id, value) {
   element.dataset.id = id;
   element.innerHTML = `<p class="value">${value}</p>
             <div class="listBtns">
-              <button type="button" class="editBtn">+
+              <button type="button" class="editBtn">éditer
               </button>
-              <button type="button" class="deleteBtn">-
+              <button type="button" class="deleteBtn">supprimer
               </button>
             </div>`;
   // fin basket
@@ -61,6 +62,7 @@ function createListItem(id, value) {
   deleteBtn.addEventListener("click", deleteItem);
   // edit one
   const editBtn = element.querySelector(".editBtn");
+  // editBtn.innerHTML = `<i class="fa-solid fa-pen"></i>`;
   editBtn.addEventListener("click", editItem);
 
   list.appendChild(element);
@@ -171,4 +173,14 @@ function editLocalStorage(id, value) {
 
 // ****** METTRE EN PLACE LES ITEMS **********
 // récupérer la liste dans le localStorage ou en créer une vide
-function setupItems() {}
+function setupItems() {
+  let items = getLocalStorage();
+  if (items.length > 0) {
+    items.forEach(function (item) {
+      createListItem(item.id, item.value);
+    });
+    clearBtn.classList.add("showMe");
+  }
+}
+
+setupItems();
