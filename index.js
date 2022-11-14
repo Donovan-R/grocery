@@ -1,7 +1,7 @@
 // ****** SELECTIONNER LES ELEMENTS HTML **********
 
 // option d'édition
-const date = new Date();
+
 const alert = document.querySelector(".alert");
 const submit = document.getElementById("submit");
 const articleToAdd = document.getElementById("basket");
@@ -24,19 +24,20 @@ submit.addEventListener("click", addItem);
 
 function addItem(e) {
   e.preventDefault();
-  let id = date.getTime().toString();
-  let value = articleToAdd.value;
+  const value = articleToAdd.value;
+  const id = new Date().getTime().toString();
   if (!value) {
     displayAlert("veuillez saisir une donnée valable", "lightcoral");
   } else if (value && !editFlag) {
     createListItem(id, value);
-    // addToLocalStorage(id, value);
+    addToLocalStorage(id, value);
     displayAlert("l'article a bien été ajouté", "lightgreen");
     clearBtn.classList.add("showMe");
     setBackToDefault();
   } else {
     displayAlert("l'article a été modifié", "lightgreen");
     editElement.textContent = value;
+    editLocalStorage(editId, value);
     setBackToDefault();
   }
 }
@@ -79,6 +80,7 @@ function clearItems() {
   clearBtn.classList.remove("showMe");
   displayAlert("le panier a été vidé", "lightcoral");
   clearBtn.classList.remove("showMe");
+  localStorage.removeItem("list");
   setBackToDefault();
 }
 clearBtn.addEventListener("click", clearItems);
@@ -105,15 +107,15 @@ function setBackToDefault() {
   editFlag = false;
   editId = "";
   submit.textContent = "ajouter";
-  // alert.style.background = "transparent";
   articleToAdd.focus();
 }
 
 // supprimer un item
 function deleteItem(e) {
   const articleAdded = document.querySelectorAll(".listItem");
-  e.currentTarget.parentElement.parentElement.remove();
-
+  const toDelete = e.currentTarget.parentElement.parentElement;
+  removeFromLocalStorage(toDelete.dataset.id);
+  toDelete.remove();
   displayAlert("l'article a bien été enlevé", "lightcoral");
   if (articleAdded.length - 1 === 0) {
     clearBtn.classList.remove("showMe");
@@ -122,11 +124,11 @@ function deleteItem(e) {
 }
 // éditer un item
 function editItem(e) {
+  const toEdit = e.currentTarget.parentElement.parentElement;
   editFlag = true;
   editElement = e.currentTarget.parentElement.parentElement.firstChild;
-  // editId=
-  articleToAdd.value =
-    e.currentTarget.parentElement.parentElement.firstChild.textContent;
+  editId = toEdit.dataset.id;
+  articleToAdd.value = editElement.textContent;
   articleToAdd.focus();
   displayAlert("l'article peut être modifié", "lightblue");
   submit.textContent = "modifier";
@@ -136,25 +138,36 @@ function editItem(e) {
 
 function getLocalStorage() {
   const list = localStorage.getItem("list");
-  if (list === undefined) {
+  if (list === null || list === undefined) {
     return [];
   } else {
-    JSON.parse(list);
+    return JSON.parse(list);
   }
 }
 
-function addToLocalStorage() {
+function addToLocalStorage(id, value) {
   const items = getLocalStorage();
   const item = { id, value };
   items.push(item);
-  localStorage.setItem("list", items);
+  localStorage.setItem("list", JSON.stringify(items));
 }
 
-function removeFromLocalStorage(id) {}
+function removeFromLocalStorage(id) {
+  const items = getLocalStorage();
+  const out = items.filter((item) => item.id !== id);
+  localStorage.setItem("list", JSON.stringify(out));
+}
 
-function editLocalStorage(id, value) {}
-
-function getLocalStorage() {}
+function editLocalStorage(id, value) {
+  const items = getLocalStorage();
+  const newItems = items.map(function (item) {
+    if (item.id === id) {
+      item.value = value;
+    }
+    return item;
+  });
+  localStorage.setItem("list", JSON.stringify(newItems));
+}
 
 // ****** METTRE EN PLACE LES ITEMS **********
 // récupérer la liste dans le localStorage ou en créer une vide
