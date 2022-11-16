@@ -8,6 +8,7 @@ const articleToAdd = document.getElementById("basket");
 const placeHolder = articleToAdd.getAttribute("placeholder");
 const list = document.querySelector(".listDetails");
 const clearBtn = document.querySelector(".listClear");
+const container = document.querySelector(".listDetails");
 
 let editFlag = false;
 let editId = "";
@@ -55,14 +56,17 @@ function createListItem(id, value) {
               <button type="button" class="deleteBtn">supprimer
               </button>
             </div>`;
+  element.setAttribute("draggable", "true");
+  dragItem();
   // fin basket
   //   create button basket
   // delete one
   const deleteBtn = element.querySelector(".deleteBtn");
+  deleteBtn.innerHTML = `<i class="fa-solid fa-trash"></i>`;
   deleteBtn.addEventListener("click", deleteItem);
   // edit one
   const editBtn = element.querySelector(".editBtn");
-  // editBtn.innerHTML = `<i class="fa-solid fa-pen"></i>`;
+  editBtn.innerHTML = `<i class="fa-solid fa-pen"></i>`;
   editBtn.addEventListener("click", editItem);
 
   list.appendChild(element);
@@ -184,3 +188,47 @@ function setupItems() {
 }
 
 setupItems();
+
+// dragging
+function dragItem() {
+  const draggables = document.querySelectorAll(".listItem");
+  console.log(draggables);
+  draggables.forEach((draggable) => {
+    draggable.addEventListener(`dragstart`, () => {
+      draggable.classList.add("dragging");
+    });
+
+    draggable.addEventListener(`dragend`, () => {
+      draggable.classList.remove(`dragging`);
+    });
+  });
+}
+
+container.addEventListener(`dragover`, (e) => {
+  e.preventDefault();
+  const afterElement = getDragAfterElement(container, e.clientY);
+  const draggable = document.querySelector(`.dragging`);
+  if (afterElement === null) {
+    container.appendChild(draggable);
+  } else {
+    container.insertBefore(draggable, afterElement);
+  }
+});
+
+function getDragAfterElement(container, y) {
+  const draggableElements = [
+    ...container.querySelectorAll(`.listItem:not(.dragging)`),
+  ];
+  return draggableElements.reduce(
+    (closest, child) => {
+      const box = child.getBoundingClientRect();
+      const offset = y - box.top - box.height / 2;
+      if (offset < 0 && offset > closest.offset) {
+        return { offset: offset, element: child };
+      } else {
+        return closest;
+      }
+    },
+    { offset: Number.NEGATIVE_INFINITY }
+  ).element;
+}
