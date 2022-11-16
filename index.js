@@ -56,8 +56,7 @@ function createListItem(id, value) {
               <button type="button" class="deleteBtn">supprimer
               </button>
             </div>`;
-  element.setAttribute("draggable", "true");
-  dragItem();
+
   // fin basket
   //   create button basket
   // delete one
@@ -70,6 +69,8 @@ function createListItem(id, value) {
   editBtn.addEventListener("click", editItem);
 
   list.appendChild(element);
+  element.setAttribute("draggable", "true");
+  dragItem();
 }
 
 // supprimer tous les items
@@ -192,12 +193,10 @@ setupItems();
 // dragging
 function dragItem() {
   const draggables = document.querySelectorAll(".listItem");
-  console.log(draggables);
   draggables.forEach((draggable) => {
     draggable.addEventListener(`dragstart`, () => {
       draggable.classList.add("dragging");
     });
-
     draggable.addEventListener(`dragend`, () => {
       draggable.classList.remove(`dragging`);
     });
