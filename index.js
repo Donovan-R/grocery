@@ -47,6 +47,7 @@ function addItem(e) {
 function createListItem(id, value) {
   // create basket
   const element = document.createElement("article");
+
   element.classList.add("listItem");
   element.dataset.id = id;
   element.innerHTML = `<p class="value">${value}</p>
@@ -67,8 +68,8 @@ function createListItem(id, value) {
   const editBtn = element.querySelector(".editBtn");
   editBtn.innerHTML = `<i class="fa-solid fa-pen"></i>`;
   editBtn.addEventListener("click", editItem);
-
   list.appendChild(element);
+  // dragItem
   element.setAttribute("draggable", "true");
   dragItem();
 }
